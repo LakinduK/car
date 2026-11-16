@@ -30,7 +30,7 @@ body {
   top: 0;
   z-index: 10;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 14px clamp(16px, 4vw, 48px);
@@ -46,7 +46,11 @@ body {
   text-decoration: none;
   letter-spacing: 0.01em;
 }
+.brand { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.brand b { font-weight: 400; }
 .brand span { color: var(--accent); font-style: italic; }
+/* The logo file has a white background; multiply lets the page colour show through. */
+.brand img { display: block; width: 34px; height: 34px; mix-blend-mode: multiply; }
 
 .masthead nav { display: flex; gap: clamp(10px, 2vw, 26px); overflow-x: auto; scrollbar-width: none; }
 .masthead nav::-webkit-scrollbar { display: none; }
