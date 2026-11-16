@@ -7,6 +7,7 @@
   --accent: #b4532a;
   --card: #faf7ee;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --page: 1180px;
   --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -33,7 +34,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px clamp(16px, 4vw, 48px);
+  padding: 14px max(clamp(16px, 4vw, 48px), calc((100vw - var(--page)) / 2 + 48px));
   background: color-mix(in srgb, var(--paper) 88%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
@@ -63,6 +64,8 @@ body {
   white-space: nowrap;
 }
 .masthead nav a:hover { color: var(--ink); }
+
+main { max-width: var(--page); margin: 0 auto; }
 
 /* ---------- hero ---------- */
 
@@ -296,7 +299,14 @@ h2 {
 .swatch strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 20px; }
 .swatch small { color: var(--ink-soft); }
 
-footer { padding: 32px clamp(16px, 4vw, 48px) 48px; color: var(--ink-soft); font-size: 13px; }
+footer {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 32px clamp(16px, 4vw, 48px) 48px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-align: center;
+}
 footer p { margin: 0 0 8px; }
 footer a { color: var(--accent); text-decoration: none; }
 footer a:hover { text-decoration: underline; }

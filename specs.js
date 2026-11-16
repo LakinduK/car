@@ -6,7 +6,7 @@ export const specs = {
     { label: 'Body', value: '5-door hatchback', tbc: false },
     { label: 'Generation', value: 'K12', tbc: false },
     { label: 'Model code', value: 'DBA-AK12', tbc: false },
-    { label: 'Built', value: '2007 · Japan', tbc: false },
+    { label: 'Built', value: '2008 · Japan', tbc: false },
     { label: 'First registered', value: '2011', tbc: false },
     { label: 'Seats', value: '5', tbc: false },
     { label: 'Steering', value: 'Right-hand drive', tbc: false },

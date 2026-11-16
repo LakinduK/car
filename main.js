@@ -78,9 +78,9 @@ function addGroundShadow(minY) {
 
 const VIEWS = {
   // direction from the car centre to the camera, and distance in car lengths
-  front: { dir: [0.55, 0.28, 1], dist: 1.75 },
-  side: { dir: [-1, 0.16, 0.02], dist: 1.75 },
-  rear: { dir: [-0.6, 0.3, -1], dist: 1.75 },
+  front: { dir: [0.55, 0.28, 1], dist: 1.3 },
+  side: { dir: [-1, 0.16, 0.02], dist: 1.3 },
+  rear: { dir: [-0.6, 0.3, -1], dist: 1.3 },
 };
 
 function viewPose(name) {
@@ -92,9 +92,9 @@ function viewPose(name) {
   }
   const v = VIEWS[name];
   const target = carCenter.clone().add(new THREE.Vector3(0, -carSize.y * 0.08, 0));
-  const fit = Math.max(1, 1.05 / camera.aspect); // pull back on narrow screens
+  const fit = Math.max(1, 1.4 / camera.aspect); // pull back on narrow screens
   const eye = target.clone().add(new THREE.Vector3(...v.dir).normalize().multiplyScalar(carSize.z * v.dist * fit));
-  return { eye, target, min: carSize.z * 0.75, max: carSize.z * 4 };
+  return { eye, target, min: carSize.z * 0.6, max: carSize.z * 4 };
 }
 
 function goToView(name, instant = false) {
