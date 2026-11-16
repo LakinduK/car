@@ -178,6 +178,8 @@ loader.load(
       });
     }
 
+    setupCustomise(car);
+
     goToView('front', true);
     loadingEl.hidden = true;
     controlsEl.hidden = false;
@@ -196,6 +198,181 @@ loader.load(
     loadingText.textContent = 'The 3D model could not be loaded.';
   }
 );
+
+// ---------- customise: paint colour and number plate ----------
+
+const DEFAULT_PAINT = '#eae0c2';
+const PAINTS = [
+  ['Cream', '#eae0c2'],
+  ['White', '#f1f0ea'],
+  ['Silver', '#b9bdc0'],
+  ['Sky blue', '#a7c6d6'],
+  ['Sage', '#b4c29a'],
+  ['Pink', '#e6bfc4'],
+  ['Orange', '#d5562a'],
+  ['Red', '#a8242b'],
+  ['Blue', '#2c4a94'],
+  ['Black', '#1b1b1d'],
+];
+// Where the two plates sit in the plate texture (fractions of its width/height).
+const PLATE_RECTS = {
+  rear: { x: 0.031, y: 0.063, w: 0.496, h: 0.396, fill: '#f2c200' },
+  front: { x: 0.03, y: 0.555, w: 0.495, h: 0.395, fill: '#f7f7f4' },
+};
+
+const custom = { paint: DEFAULT_PAINT, plate: '' };
+let applyPaint = () => {};
+let applyPlate = () => {};
+
+const cleanPlate = (s) => s.toUpperCase().replace(/[^A-Z0-9 -]/g, '').replace(/\s+/g, ' ').slice(0, 12);
+const cleanPaint = (s) => (/^#?[0-9a-f]{6}$/i.test(s) ? '#' + s.replace('#', '').toLowerCase() : null);
+
+function readHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  custom.paint = cleanPaint(p.get('paint') ?? '') ?? DEFAULT_PAINT;
+  custom.plate = cleanPlate(p.get('plate') ?? '');
+}
+
+function writeHash() {
+  const p = new URLSearchParams();
+  if (custom.paint !== DEFAULT_PAINT) p.set('paint', custom.paint.slice(1));
+  if (custom.plate) p.set('plate', custom.plate);
+  const hash = p.toString();
+  history.replaceState(null, '', hash ? '#' + hash : location.pathname + location.search);
+}
+
+function drawPlate(ctx, rect, text, W, H) {
+  const x = rect.x * W, y = rect.y * H, w = rect.w * W, h = rect.h * H;
+  const r = h * 0.07;
+  ctx.fillStyle = '#16161a';
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.fill();
+  const b = h * 0.035;
+  ctx.fillStyle = rect.fill;
+  ctx.beginPath();
+  ctx.roundRect(x + b, y + b, w - 2 * b, h - 2 * b, r * 0.7);
+  ctx.fill();
+
+  // "WP KO-1436" becomes two lines, split at the last dash; otherwise one line.
+  const cut = text.lastIndexOf('-');
+  const lines = cut > 0 && cut < text.length - 1 ? [text.slice(0, cut).trim(), text.slice(cut + 1).trim()] : [text];
+  ctx.fillStyle = '#111114';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const maxW = w * 0.84;
+  const slotH = (h * 0.8) / lines.length;
+  lines.forEach((line, i) => {
+    let size = slotH * (lines.length > 1 ? 1.05 : 0.8);
+    ctx.font = `700 ${size}px "Arial Narrow", "Roboto Condensed", Arial, sans-serif`;
+    const tw = ctx.measureText(line).width;
+    if (tw > maxW) size *= maxW / tw;
+    ctx.font = `700 ${size}px "Arial Narrow", "Roboto Condensed", Arial, sans-serif`;
+    ctx.fillText(line, x + w / 2, y + h * 0.1 + slotH * (i + 0.5) + size * 0.04);
+  });
+}
+
+function setupCustomise(car) {
+  const paintMats = new Set();
+  const edgeMats = new Set();
+  const plateMats = new Set();
+  car.traverse((o) => {
+    if (!o.isMesh) return;
+    for (const m of [].concat(o.material)) {
+      if (m.name === 'Carpaint') paintMats.add(m);
+      else if (m.name === 'Carpaint_edge') edgeMats.add(m);
+      else if (m.name === 'plates') plateMats.add(m);
+    }
+  });
+
+  applyPaint = () => {
+    const c = new THREE.Color(custom.paint);
+    for (const m of paintMats) m.color.copy(c);
+    for (const m of edgeMats) m.color.copy(c).multiplyScalar(0.7);
+    for (const chip of document.querySelectorAll('.chip')) {
+      chip.setAttribute('aria-pressed', String(chip.dataset.paint === custom.paint));
+    }
+    document.getElementById('paint-picker').value = custom.paint;
+  };
+
+  const first = [...plateMats][0];
+  if (first?.map?.image) {
+    const original = first.map;
+    const originalNormal = first.normalMap;
+    const W = original.image.width, H = original.image.height;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.flipY = original.flipY;
+    tex.colorSpace = original.colorSpace;
+    tex.wrapS = original.wrapS;
+    tex.wrapT = original.wrapT;
+    tex.channel = original.channel;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+    applyPlate = () => {
+      for (const m of plateMats) {
+        if (!custom.plate) {
+          m.map = original;
+          m.normalMap = originalNormal;
+        } else {
+          ctx.clearRect(0, 0, W, H);
+          ctx.drawImage(original.image, 0, 0, W, H);
+          drawPlate(ctx, PLATE_RECTS.rear, custom.plate, W, H);
+          drawPlate(ctx, PLATE_RECTS.front, custom.plate, W, H);
+          tex.needsUpdate = true;
+          m.map = tex;
+          m.normalMap = null; // the original has the old number embossed
+        }
+        m.needsUpdate = true;
+      }
+    };
+  }
+
+  // UI
+  const chips = document.getElementById('paint-chips');
+  chips.innerHTML = PAINTS.map(
+    ([name, hex]) =>
+      `<button type="button" class="chip" data-paint="${hex}" title="${name}" aria-label="${name}" aria-pressed="false" style="background:${hex}"></button>`
+  ).join('');
+  const picker = document.getElementById('paint-picker');
+  const plateInput = document.getElementById('plate-input');
+
+  chips.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    custom.paint = chip.dataset.paint;
+    applyPaint();
+    writeHash();
+  });
+  picker.addEventListener('input', () => {
+    custom.paint = picker.value.toLowerCase();
+    applyPaint();
+    writeHash();
+  });
+  plateInput.addEventListener('input', () => {
+    custom.plate = cleanPlate(plateInput.value);
+    if (plateInput.value !== custom.plate) plateInput.value = custom.plate;
+    applyPlate();
+    writeHash();
+  });
+  document.getElementById('customise-reset').addEventListener('click', () => {
+    custom.paint = DEFAULT_PAINT;
+    custom.plate = '';
+    plateInput.value = '';
+    applyPaint();
+    applyPlate();
+    writeHash();
+  });
+
+  readHash();
+  plateInput.value = custom.plate;
+  applyPaint();
+  applyPlate();
+  document.getElementById('customise').hidden = false;
+}
 
 // ---------- interaction ----------
 
