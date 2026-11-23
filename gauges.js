@@ -45,7 +45,7 @@ function gaugeSvg(g, i) {
   <svg viewBox="0 0 200 200" role="img" aria-label="${g.caption}: ${g.readout} ${g.unit}">
     <defs>
       <radialGradient id="${id}-face" cx="50%" cy="38%" r="65%">
-        <stop offset="0" stop-color="#25262b"/><stop offset="1" stop-color="#0b0c0e"/>
+        <stop offset="0" stop-color="#2a3740"/><stop offset="1" stop-color="#0a0f12"/>
       </radialGradient>
       <linearGradient id="${id}-bezel" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#6b6d73"/><stop offset=".5" stop-color="#2a2b30"/><stop offset="1" stop-color="#8a8c92"/>

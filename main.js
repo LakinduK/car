@@ -52,7 +52,7 @@ let currentView = 'front';
 function frame() {
   const { clientWidth: w, clientHeight: h } = stage;
   if (currentView === 'cabin') camera.clearViewOffset();
-  else if (camera.aspect > 1.25) camera.setViewOffset(w, h, -w * 0.14, h * 0.07, w, h); // right, and up clear of the dock
+  else if (camera.aspect > 1.25) camera.setViewOffset(w, h, 0, h * 0.04, w, h); // centred, lifted clear of the dock
   else camera.setViewOffset(w, h, 0, -h * 0.03, w, h);
   camera.updateProjectionMatrix();
 }
@@ -90,9 +90,9 @@ function addGroundShadow(minY) {
 
 const VIEWS = {
   // direction from the car centre to the camera, and distance in car lengths
-  front: { dir: [0.55, 0.28, 1], dist: 2.0 },
-  side: { dir: [-1, 0.16, 0.02], dist: 2.0 },
-  rear: { dir: [-0.6, 0.3, -1], dist: 2.0 },
+  front: { dir: [0.55, 0.28, 1], dist: 2.6 },
+  side: { dir: [-1, 0.16, 0.02], dist: 2.6 },
+  rear: { dir: [-0.6, 0.3, -1], dist: 2.6 },
 };
 
 function viewPose(name) {
@@ -105,7 +105,7 @@ function viewPose(name) {
   const v = VIEWS[name];
   const target = carCenter.clone().add(new THREE.Vector3(0, -carSize.y * 0.08, 0));
   // Portrait screens: the stage is its own box below the title, so come in closer.
-  const fit = camera.aspect < 1 ? 0.78 / camera.aspect : Math.max(1, 1.1 / camera.aspect);
+  const fit = camera.aspect < 1 ? 0.6 / camera.aspect : Math.max(1, 1.1 / camera.aspect);
   const eye = target.clone().add(new THREE.Vector3(...v.dir).normalize().multiplyScalar(carSize.z * v.dist * fit));
   return { eye, target, min: carSize.z * 0.6, max: carSize.z * 4 };
 }
@@ -113,11 +113,11 @@ function viewPose(name) {
 function goToView(name, instant = false) {
   const pose = viewPose(name);
   currentView = name;
-  // Keep the segmented view control in step (and slide its highlight).
+  turnTween = null;
+  // Keep every view control (side rail and the dock's switcher) in step.
+  for (const b of document.querySelectorAll('[data-view]')) b.setAttribute('aria-pressed', String(b.dataset.view === name));
   const seg = document.querySelector('.segmented');
-  const btns = [...seg.querySelectorAll('[data-view]')];
-  btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
-  seg.style.setProperty('--i', Math.max(0, btns.findIndex((b) => b.dataset.view === name)));
+  if (seg) seg.style.setProperty('--i', Math.max(0, ['front', 'side', 'rear', 'cabin'].indexOf(name)));
   camera.fov = pose.fov ?? 32; // wider lens inside the cabin
   frame();
   orbit.minDistance = 0.01;
@@ -202,7 +202,8 @@ loader.load(
     goToView('front', true);
     loadingEl.hidden = true;
     controlsEl.hidden = false;
-    window.__march = { scene, camera, orbit, doors, setDoor, goToView }; // handy in the console
+    document.querySelector('.hero').classList.add('is-ready');
+    Object.assign(window.__march ?? (window.__march = {}), { scene, camera, orbit, doors, setDoor, goToView }); // handy in the console
   },
   (e) => {
     if (e.total) {
@@ -416,6 +417,48 @@ controlsEl.addEventListener('click', (e) => {
   }
 });
 
+// Side rail, zoom stack and the 360° turn buttons live in the hero, outside the dock.
+let turnTween = null;
+
+function zoom(kind) {
+  stopSpin();
+  if (kind === 'fit') return goToView(currentView);
+  turnTween = null;
+  const offset = camera.position.clone().sub(orbit.target);
+  const dist = THREE.MathUtils.clamp(offset.length() * (kind === 'in' ? 0.8 : 1.25), orbit.minDistance, orbit.maxDistance);
+  viewTween = {
+    t: 0,
+    fromEye: camera.position.clone(),
+    fromTarget: orbit.target.clone(),
+    eye: orbit.target.clone().add(offset.setLength(dist)),
+    target: orbit.target.clone(),
+    done() {},
+  };
+}
+
+function turn(dir) {
+  stopSpin();
+  // Finish any zoom or view move first, or it would keep pulling the camera back.
+  if (viewTween) {
+    camera.position.copy(viewTween.eye);
+    orbit.target.copy(viewTween.target);
+    viewTween.done();
+    viewTween = null;
+  }
+  turnTween = { t: 0, by: (dir * Math.PI) / 4, last: 0 };
+}
+
+document.querySelector('.hero').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b || b.closest('#controls')) return;
+  if (b.dataset.view) {
+    stopSpin();
+    goToView(b.dataset.view);
+  } else if (b.dataset.zoom) zoom(b.dataset.zoom);
+  else if (b.dataset.turn) turn(Number(b.dataset.turn));
+});
+Object.assign(window.__march ?? (window.__march = {}), { zoom, turn });
+
 function stopSpin() {
   orbit.autoRotate = false;
   document.querySelector('[data-spin]').setAttribute('aria-pressed', 'false');
@@ -454,12 +497,14 @@ canvas.addEventListener('pointermove', (e) => {
 });
 orbit.addEventListener('start', () => {
   viewTween = null;
+  turnTween = null;
 });
 
 // ---------- loop ----------
 
 const clock = new THREE.Clock();
 const ease = (t) => t * t * (3 - 2 * t);
+const UP = new THREE.Vector3(0, 1, 0);
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -469,6 +514,16 @@ renderer.setAnimationLoop(() => {
     const step = reduceMotion ? 1 : dt / 0.9;
     d.value = d.target > d.value ? Math.min(d.target, d.value + step) : Math.max(d.target, d.value - step);
     d.node.rotation[HINGE_AXIS] = THREE.MathUtils.lerp(d.closed, d.open, ease(d.value));
+  }
+
+  if (turnTween) {
+    // Swing the camera round the car on an arc, not a straight line.
+    turnTween.t = reduceMotion ? 1 : Math.min(1, turnTween.t + dt / 0.7);
+    const a = turnTween.by * ease(turnTween.t);
+    const off = camera.position.clone().sub(orbit.target).applyAxisAngle(UP, a - turnTween.last);
+    camera.position.copy(orbit.target).add(off);
+    turnTween.last = a;
+    if (turnTween.t === 1) turnTween = null;
   }
 
   if (viewTween) {
