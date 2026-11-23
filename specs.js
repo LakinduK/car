@@ -2,12 +2,24 @@
 // checked against the real car, and the "to confirm" tag disappears.
 
 export const specs = {
-  // The four big numbers under the 3D viewer.
-  highlights: [
-    { value: '1,240', unit: 'cc', label: 'CR12DE petrol engine' },
-    { value: '90', unit: 'PS', label: 'Maximum power' },
-    { value: '950', unit: 'kg', label: 'Unladen weight' },
-    { value: '3.72', unit: 'm', label: 'Overall length' },
+  // The instrument dials under the 3D viewer (drawn by gauges.js).
+  gauges: [
+    {
+      caption: 'Peak power', sub: 'at 6,000 rpm', readout: '90', unit: 'PS',
+      legend: '×1000 r/min', min: 0, max: 8, value: 6, ticks: 16, majorEvery: 2, redFrom: 6.5, redTo: 8,
+    },
+    {
+      caption: 'Peak torque', sub: 'at 4,400 rpm', readout: '121', unit: 'N·m',
+      min: 0, max: 160, value: 121, ticks: 16, majorEvery: 2,
+    },
+    {
+      caption: 'Power to weight', sub: '90 PS · 950 kg', readout: '95', unit: 'PS / tonne',
+      min: 0, max: 200, value: 94.7, ticks: 20, majorEvery: 5,
+    },
+    {
+      caption: 'Fuel tank', sub: '1,240 cc petrol', readout: '41', unit: 'litres',
+      min: 0, max: 41, value: 41, ticks: 8, majorEvery: 4, labels: ['E', '½', 'F'], redFrom: 0, redTo: 5.125,
+    },
   ],
   overview: [
     { label: 'Body', value: '5-door hatchback', tbc: false },
