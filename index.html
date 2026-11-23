@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Nissan March K12</title>
-  <meta name="description" content="A brochure for my Nissan March K12, with a 3D model you can turn and open.">
+  <meta name="description" content="A brochure for my Nissan March K12, with a 3D model you can turn, open and repaint.">
+  <meta name="theme-color" content="#0c0d0f">
+  <link rel="icon" href="models/nissan-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script type="importmap">
     {
@@ -18,7 +23,7 @@
 <body>
   <header class="masthead">
     <a class="brand" href="#top">
-      <img src="models/nissan-logo.png" alt="Nissan" width="34" height="34">
+      <img src="models/nissan-logo.png" alt="Nissan" width="30" height="30">
       <b>March <span>K12</span></b>
     </a>
     <nav aria-label="Sections">
@@ -30,12 +35,12 @@
     </nav>
   </header>
 
-  <main id="top">
-    <section class="hero" aria-label="3D model">
+  <main>
+    <section class="hero" id="top" aria-label="3D model">
       <div class="hero-copy">
-        <p class="eyebrow">Nissan · 2002–2010</p>
-        <h1>March <em>K12</em></h1>
-        <p class="lede">Round headlamps, a tall cabin and a footprint that fits anywhere. Turn it, open the doors, look inside.</p>
+        <p class="eyebrow">Nissan · 2008 · DBA-AK12</p>
+        <h1>March <span>K12</span></h1>
+        <p class="lede">A 1.2-litre city car with round headlamps and a tall, bright cabin. Turn it, open the doors, make it yours.</p>
       </div>
 
       <div class="stage" id="stage">
@@ -44,82 +49,91 @@
           <div class="bar"><i id="loading-bar"></i></div>
           <span id="loading-text">Loading model…</span>
         </div>
-        <p class="hint" id="hint">Drag to turn · scroll to zoom · click a door</p>
       </div>
 
-      <div class="controls" id="controls" hidden>
-        <div class="group" role="group" aria-label="Doors">
-          <span class="label">Doors</span>
+      <div class="dock" id="controls" hidden>
+        <div class="dock-head">
+          <div class="tabs" role="tablist" aria-label="Car controls">
+            <button type="button" role="tab" id="tab-doors" aria-controls="panel-doors" aria-selected="true">Doors</button>
+            <button type="button" role="tab" id="tab-view" aria-controls="panel-view" aria-selected="false" tabindex="-1">View</button>
+            <button type="button" role="tab" id="tab-paint" aria-controls="panel-paint" aria-selected="false" tabindex="-1">Paint</button>
+            <button type="button" role="tab" id="tab-plate" aria-controls="panel-plate" aria-selected="false" tabindex="-1">Plate</button>
+          </div>
+          <button type="button" class="link" id="customise-reset" title="Back to cream and the original plate">Reset</button>
+        </div>
+
+        <div class="panel" id="panel-doors" role="tabpanel" aria-labelledby="tab-doors">
           <button type="button" data-door="Door_FL" aria-pressed="false">Front left</button>
           <button type="button" data-door="Door_FR" aria-pressed="false">Front right</button>
           <button type="button" data-door="Door_RL" aria-pressed="false">Rear left</button>
           <button type="button" data-door="Door_RR" aria-pressed="false">Rear right</button>
-          <button type="button" data-door="all" class="ghost">Open all</button>
+          <button type="button" data-door="all" class="strong">Open all</button>
         </div>
-        <div class="group" role="group" aria-label="View">
-          <span class="label">View</span>
+
+        <div class="panel" id="panel-view" role="tabpanel" aria-labelledby="tab-view" hidden>
           <button type="button" data-view="front">Front</button>
           <button type="button" data-view="side">Side</button>
           <button type="button" data-view="rear">Rear</button>
           <button type="button" data-view="cabin">Cabin</button>
-          <button type="button" data-spin aria-pressed="true" class="ghost">Turntable</button>
+          <button type="button" data-spin aria-pressed="true" class="strong">Turntable</button>
         </div>
-      </div>
 
-      <div class="customise" id="customise" hidden>
-        <div class="group" role="group" aria-label="Paint colour">
-          <span class="label">Paint</span>
-          <div class="chips" id="paint-chips"></div>
-          <label class="picker" title="Pick any colour">
-            <input type="color" id="paint-picker" value="#eae0c2" aria-label="Custom paint colour">
-            <span>Custom</span>
-          </label>
+        <div id="customise" class="contents" hidden>
+          <div class="panel" id="panel-paint" role="tabpanel" aria-labelledby="tab-paint" hidden>
+            <div class="chips" id="paint-chips"></div>
+            <label class="picker" title="Pick any colour">
+              <input type="color" id="paint-picker" value="#eae0c2" aria-label="Custom paint colour">
+              <span>Custom</span>
+            </label>
+          </div>
+          <div class="panel" id="panel-plate" role="tabpanel" aria-labelledby="tab-plate" hidden>
+            <label class="sr-only" for="plate-input">Number plate</label>
+            <input type="text" id="plate-input" maxlength="12" placeholder="ABC-1234" autocomplete="off" spellcheck="false" autocapitalize="characters">
+            <span class="note">A dash splits it over two lines</span>
+          </div>
         </div>
-        <div class="group" role="group" aria-label="Number plate">
-          <label class="label" for="plate-input">Plate</label>
-          <input type="text" id="plate-input" maxlength="12" placeholder="ABC-1234" autocomplete="off" spellcheck="false" autocapitalize="characters">
-          <button type="button" id="customise-reset" class="ghost">Reset</button>
-        </div>
+
+        <p class="hint" id="hint">Drag to turn · Ctrl + scroll to zoom · Click a door</p>
       </div>
     </section>
 
-    <div class="notice" id="placeholder-notice" hidden>
+    <section class="stats wrap" aria-label="Key figures" data-specs="highlights"></section>
+
+    <div class="notice wrap" id="placeholder-notice" hidden>
       Figures marked <span class="tbc">to confirm</span> are typical K12 values, not yet checked against this car.
     </div>
 
-    <section id="overview" class="sheet">
-      <h2>Overview</h2>
-      <div class="facts" data-specs="overview"></div>
-    </section>
-
-    <section id="engine" class="sheet">
-      <h2>Engine &amp; drivetrain</h2>
-      <dl class="table" data-specs="engine"></dl>
-    </section>
-
-    <section id="dimensions" class="sheet">
-      <h2>Dimensions</h2>
-      <dl class="table" data-specs="dimensions"></dl>
-    </section>
-
-    <section id="wheels" class="sheet">
-      <h2>Wheels &amp; tyres</h2>
-      <dl class="table" data-specs="wheels"></dl>
-    </section>
-
-    <section id="colours" class="sheet">
-      <h2>Colours</h2>
-      <div class="swatches" data-specs="colours"></div>
+    <section class="specs wrap" aria-label="Specifications">
+      <article class="card wide" id="overview">
+        <header><span class="num">01</span><h2>Overview</h2></header>
+        <div class="facts" data-specs="overview"></div>
+      </article>
+      <article class="card" id="engine">
+        <header><span class="num">02</span><h2>Engine &amp; drivetrain</h2></header>
+        <dl class="table" data-specs="engine"></dl>
+      </article>
+      <article class="card" id="dimensions">
+        <header><span class="num">03</span><h2>Dimensions</h2></header>
+        <dl class="table" data-specs="dimensions"></dl>
+      </article>
+      <article class="card" id="wheels">
+        <header><span class="num">04</span><h2>Wheels &amp; tyres</h2></header>
+        <dl class="table" data-specs="wheels"></dl>
+      </article>
+      <article class="card" id="colours">
+        <header><span class="num">05</span><h2>Colours</h2></header>
+        <div class="swatches" data-specs="colours"></div>
+      </article>
     </section>
   </main>
 
-  <footer>
+  <footer class="wrap">
     <p>A personal brochure for one car. Not affiliated with Nissan.</p>
     <p class="credit">Developed with ❤️ by <a href="https://lakinduk.me" target="_blank" rel="noopener">LakinduK.me</a> | <span id="year">2026</span></p>
   </footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
   <script type="module" src="specs.js"></script>
+  <script type="module" src="ui.js"></script>
   <script type="module" src="main.js"></script>
 </body>
 </html>

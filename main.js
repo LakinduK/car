@@ -45,11 +45,23 @@ let carSize = new THREE.Vector3(1.9, 1.6, 3.8);
 let carCenter = new THREE.Vector3();
 let viewTween = null;
 
+let currentView = 'front';
+
+// Shift the rendered image so the car sits clear of the title: to the right
+// on wide screens, a little lower on narrow ones. The cabin view stays centred.
+function frame() {
+  const { clientWidth: w, clientHeight: h } = stage;
+  if (currentView === 'cabin') camera.clearViewOffset();
+  else if (camera.aspect > 1.25) camera.setViewOffset(w, h, -w * 0.14, h * 0.07, w, h); // right, and up clear of the dock
+  else camera.setViewOffset(w, h, 0, -h * 0.03, w, h);
+  camera.updateProjectionMatrix();
+}
+
 function resize() {
   const { clientWidth: w, clientHeight: h } = stage;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
-  camera.updateProjectionMatrix();
+  frame();
 }
 new ResizeObserver(resize).observe(stage);
 resize();
@@ -59,9 +71,9 @@ function addGroundShadow(minY) {
   c.width = c.height = 256;
   const g = c.getContext('2d');
   const grad = g.createRadialGradient(128, 128, 10, 128, 128, 128);
-  grad.addColorStop(0, 'rgba(40,34,20,0.55)');
-  grad.addColorStop(0.55, 'rgba(40,34,20,0.22)');
-  grad.addColorStop(1, 'rgba(40,34,20,0)');
+  grad.addColorStop(0, 'rgba(0,0,0,0.7)');
+  grad.addColorStop(0.55, 'rgba(0,0,0,0.3)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = grad;
   g.fillRect(0, 0, 256, 256);
   const tex = new THREE.CanvasTexture(c);
@@ -78,9 +90,9 @@ function addGroundShadow(minY) {
 
 const VIEWS = {
   // direction from the car centre to the camera, and distance in car lengths
-  front: { dir: [0.55, 0.28, 1], dist: 1.3 },
-  side: { dir: [-1, 0.16, 0.02], dist: 1.3 },
-  rear: { dir: [-0.6, 0.3, -1], dist: 1.3 },
+  front: { dir: [0.55, 0.28, 1], dist: 2.0 },
+  side: { dir: [-1, 0.16, 0.02], dist: 2.0 },
+  rear: { dir: [-0.6, 0.3, -1], dist: 2.0 },
 };
 
 function viewPose(name) {
@@ -92,15 +104,17 @@ function viewPose(name) {
   }
   const v = VIEWS[name];
   const target = carCenter.clone().add(new THREE.Vector3(0, -carSize.y * 0.08, 0));
-  const fit = Math.max(1, 1.4 / camera.aspect); // pull back on narrow screens
+  // Portrait screens: the stage is its own box below the title, so come in closer.
+  const fit = camera.aspect < 1 ? 0.78 / camera.aspect : Math.max(1, 1.1 / camera.aspect);
   const eye = target.clone().add(new THREE.Vector3(...v.dir).normalize().multiplyScalar(carSize.z * v.dist * fit));
   return { eye, target, min: carSize.z * 0.6, max: carSize.z * 4 };
 }
 
 function goToView(name, instant = false) {
   const pose = viewPose(name);
+  currentView = name;
   camera.fov = pose.fov ?? 32; // wider lens inside the cabin
-  camera.updateProjectionMatrix();
+  frame();
   orbit.minDistance = 0.01;
   orbit.maxDistance = 100;
   const done = () => {

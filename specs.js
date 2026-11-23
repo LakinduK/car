@@ -2,6 +2,13 @@
 // checked against the real car, and the "to confirm" tag disappears.
 
 export const specs = {
+  // The four big numbers under the 3D viewer.
+  highlights: [
+    { value: '1,240', unit: 'cc', label: 'CR12DE petrol engine' },
+    { value: '90', unit: 'PS', label: 'Maximum power' },
+    { value: '950', unit: 'kg', label: 'Unladen weight' },
+    { value: '3.72', unit: 'm', label: 'Overall length' },
+  ],
   overview: [
     { label: 'Body', value: '5-door hatchback', tbc: false },
     { label: 'Generation', value: 'K12', tbc: false },
@@ -51,6 +58,12 @@ function render() {
     const host = document.querySelector(`[data-specs="${key}"]`);
     if (!host) continue;
     anyTbc ||= items.some((i) => i.tbc);
+    if (key === 'highlights') {
+      host.innerHTML = items
+        .map((i) => `<div class="stat"><strong>${i.value}<small>${i.unit}</small></strong><span>${i.label}</span></div>`)
+        .join('');
+      continue;
+    }
     if (key === 'overview') {
       host.innerHTML = items
         .map((i) => `<div class="fact"><span>${i.label}</span><strong>${i.value}</strong>${tag(i)}</div>`)
