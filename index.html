@@ -86,20 +86,40 @@
         </div>
 
         <div class="panel" id="panel-view" role="tabpanel" aria-labelledby="tab-view" hidden>
-          <button type="button" data-view="front">Front</button>
-          <button type="button" data-view="side">Side</button>
-          <button type="button" data-view="rear">Rear</button>
-          <button type="button" data-view="cabin">Cabin</button>
-          <button type="button" data-spin aria-pressed="true" class="strong">Turntable</button>
+          <div class="segmented" role="group" aria-label="Camera">
+            <span class="seg-thumb" aria-hidden="true"></span>
+            <button type="button" data-view="front" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 10 8 5.5h8l1.5 4.5"/><rect x="4" y="10" width="16" height="6.5" rx="2"/><circle cx="7.6" cy="13.2" r="1.3"/><circle cx="16.4" cy="13.2" r="1.3"/><path d="M6 16.5v2M18 16.5v2M10.5 14h3"/></svg>
+              <span>Front</span>
+            </button>
+            <button type="button" data-view="side" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 15.5v-3l3-1.2L8.3 7.5h7l3 3.8 2.7.9v3.3h-1.5M7.8 15.5h8.4M4 15.5H2.5"/><circle cx="6" cy="15.8" r="1.9"/><circle cx="18" cy="15.8" r="1.9"/><path d="M8.8 11.3h9.3"/></svg>
+              <span>Side</span>
+            </button>
+            <button type="button" data-view="rear" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.8 10 8 5.5h8l1.2 4.5"/><rect x="4" y="10" width="16" height="6.5" rx="2"/><path d="M5.8 12.3h2.6M15.6 12.3h2.6M10 14.2h4M6 16.5v2M18 16.5v2"/></svg>
+              <span>Rear</span>
+            </button>
+            <button type="button" data-view="cabin" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.2"/><path d="M4.3 13.2h5.5M14.2 13.2h5.5M12 14.2v5.8"/></svg>
+              <span>Cabin</span>
+            </button>
+          </div>
+          <button type="button" class="switch" data-spin aria-pressed="true">
+            <span class="track" aria-hidden="true"><span class="knob"></span></span>
+            Auto-rotate
+          </button>
         </div>
 
         <div id="customise" class="contents" hidden>
-          <div class="panel" id="panel-paint" role="tabpanel" aria-labelledby="tab-paint" hidden>
-            <div class="chips" id="paint-chips"></div>
-            <label class="picker" title="Pick any colour">
-              <input type="color" id="paint-picker" value="#eae0c2" aria-label="Custom paint colour">
-              <span>Custom</span>
-            </label>
+          <div class="panel paint-panel" id="panel-paint" role="tabpanel" aria-labelledby="tab-paint" hidden>
+            <p class="paint-readout" aria-live="polite"><strong id="paint-name">Cream</strong><span id="paint-hex">#EAE0C2</span></p>
+            <div class="chips">
+              <div class="chips" id="paint-chips"></div>
+              <label class="chip chip-custom" id="paint-custom" title="Pick any colour">
+                <input type="color" id="paint-picker" value="#eae0c2" aria-label="Custom paint colour">
+              </label>
+            </div>
           </div>
           <div class="panel" id="panel-plate" role="tabpanel" aria-labelledby="tab-plate" hidden>
             <label class="sr-only" for="plate-input">Number plate</label>

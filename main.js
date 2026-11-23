@@ -113,6 +113,11 @@ function viewPose(name) {
 function goToView(name, instant = false) {
   const pose = viewPose(name);
   currentView = name;
+  // Keep the segmented view control in step (and slide its highlight).
+  const seg = document.querySelector('.segmented');
+  const btns = [...seg.querySelectorAll('[data-view]')];
+  btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
+  seg.style.setProperty('--i', Math.max(0, btns.findIndex((b) => b.dataset.view === name)));
   camera.fov = pose.fov ?? 32; // wider lens inside the cabin
   frame();
   orbit.minDistance = 0.01;
@@ -307,6 +312,10 @@ function setupCustomise(car) {
       chip.setAttribute('aria-pressed', String(chip.dataset.paint === custom.paint));
     }
     document.getElementById('paint-picker').value = custom.paint;
+    const named = PAINTS.find(([, hex]) => hex === custom.paint);
+    document.getElementById('paint-name').textContent = named ? named[0] : 'Custom';
+    document.getElementById('paint-hex').textContent = custom.paint.toUpperCase();
+    document.getElementById('paint-custom').classList.toggle('is-active', !named);
   };
 
   const first = [...plateMats][0];

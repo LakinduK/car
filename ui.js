@@ -6,6 +6,7 @@ const hero = document.querySelector('.hero');
 
 function updateHeader() {
   header.classList.toggle('is-solid', scrollY > hero.offsetHeight - header.offsetHeight - 8);
+  header.classList.toggle('is-scrolled', scrollY > 8);
 }
 addEventListener('scroll', updateHeader, { passive: true });
 addEventListener('resize', updateHeader);
