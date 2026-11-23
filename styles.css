@@ -5,6 +5,8 @@
   --muted: #6a6c72;
   --line: #e4e2dc;
   --accent: #d0622f;
+  --header-solid: rgba(244, 243, 239, 0.85);
+  color-scheme: light;
 
   --on-night: #f3f2ee;
   --on-night-muted: rgba(243, 242, 238, 0.62);
@@ -21,6 +23,28 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/* Dark theme: the visitor's system setting, unless they picked one with the header toggle. */
+:root[data-theme="dark"] {
+  --bg: #0e0f11;
+  --surface: #17181b;
+  --ink: #f1f0ec;
+  --muted: #9a9ca3;
+  --line: #27282d;
+  --header-solid: rgba(14, 15, 17, 0.82);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0f11;
+    --surface: #17181b;
+    --ink: #f1f0ec;
+    --muted: #9a9ca3;
+    --line: #27282d;
+    --header-solid: rgba(14, 15, 17, 0.82);
+    color-scheme: dark;
+  }
+}
+
 * { box-sizing: border-box; }
 
 [hidden] { display: none !important; }
@@ -29,6 +53,7 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
+  transition: background-color 200ms ease, color 200ms ease;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
@@ -66,8 +91,33 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
   color: var(--on-night);
   transition: background-color 250ms ease, color 250ms ease, box-shadow 250ms ease;
 }
+.masthead-end { display: flex; align-items: center; gap: clamp(10px, 2vw, 22px); min-width: 0; }
+
+.theme-toggle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 160ms var(--ease-out);
+}
+.theme-toggle:active { transform: scale(0.94); }
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+}
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .moon { display: none; }
 .masthead.is-solid {
-  background: rgba(244, 243, 239, 0.85);
+  background: var(--header-solid);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   backdrop-filter: blur(14px) saturate(160%);
   color: var(--ink);

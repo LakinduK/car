@@ -49,3 +49,38 @@ if (matchMedia('(pointer: coarse)').matches) {
 }
 
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// Light / dark theme. The inline script in <head> already applied the saved or
+// system theme; this keeps the button in step and remembers a manual choice.
+const root = document.documentElement;
+const toggle = document.getElementById('theme-toggle');
+const systemDark = matchMedia('(prefers-color-scheme: dark)');
+
+function savedTheme() {
+  try {
+    return localStorage.getItem('theme');
+  } catch {
+    return null;
+  }
+}
+
+function setTheme(theme) {
+  root.dataset.theme = theme;
+  toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+
+toggle.addEventListener('click', () => {
+  const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  setTheme(next);
+  try {
+    localStorage.setItem('theme', next);
+  } catch {
+    /* private mode: the choice just won't be remembered */
+  }
+});
+
+systemDark.addEventListener('change', (e) => {
+  if (!savedTheme()) setTheme(e.matches ? 'dark' : 'light');
+});
+
+setTheme(root.dataset.theme || (systemDark.matches ? 'dark' : 'light'));
