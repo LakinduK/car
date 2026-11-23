@@ -152,6 +152,9 @@ function setDoor(name, open) {
   const allOpen = [...doors.values()].every((x) => x.target === 1);
   allBtn.textContent = allOpen ? 'Close all' : 'Open all';
   allBtn.setAttribute('aria-pressed', String(allOpen));
+  const n = [...doors.values()].filter((x) => x.target === 1).length;
+  document.getElementById('door-status').textContent =
+    n === 0 ? 'All doors closed' : n === doors.size ? 'All doors open' : `${n} door${n > 1 ? 's' : ''} open`;
 }
 
 function toggleDoor(name) {
@@ -240,7 +243,17 @@ const PLATE_RECTS = {
   front: { x: 0.03, y: 0.555, w: 0.495, h: 0.395, fill: '#f7f7f4' },
 };
 
-const custom = { paint: DEFAULT_PAINT, plate: '' };
+const custom = { paint: DEFAULT_PAINT, plate: '', finish: 'gloss' };
+let applyFinish = () => {};
+// Paint finishes, applied to the body paint material. Gloss = as exported.
+const FINISHES = {
+  metallic: { metalness: 0.6, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.04 },
+  matte: { metalness: 0, roughness: 0.85, clearcoat: 0, clearcoatRoughness: 0.5 },
+};
+const isLight = (hex) => {
+  const c = new THREE.Color(hex);
+  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b > 0.35;
+};
 let applyPaint = () => {};
 let applyPlate = () => {};
 
@@ -251,12 +264,14 @@ function readHash() {
   const p = new URLSearchParams(location.hash.slice(1));
   custom.paint = cleanPaint(p.get('paint') ?? '') ?? DEFAULT_PAINT;
   custom.plate = cleanPlate(p.get('plate') ?? '');
+  custom.finish = FINISHES[p.get('finish')] ? p.get('finish') : 'gloss';
 }
 
 function writeHash() {
   const p = new URLSearchParams();
   if (custom.paint !== DEFAULT_PAINT) p.set('paint', custom.paint.slice(1));
   if (custom.plate) p.set('plate', custom.plate);
+  if (custom.finish !== 'gloss') p.set('finish', custom.finish);
   const hash = p.toString();
   history.replaceState(null, '', hash ? '#' + hash : location.pathname + location.search);
 }
@@ -314,9 +329,34 @@ function setupCustomise(car) {
     }
     document.getElementById('paint-picker').value = custom.paint;
     const named = PAINTS.find(([, hex]) => hex === custom.paint);
-    document.getElementById('paint-name').textContent = named ? named[0] : 'Custom';
-    document.getElementById('paint-hex').textContent = custom.paint.toUpperCase();
-    document.getElementById('paint-custom').classList.toggle('is-active', !named);
+    const customChip = document.getElementById('paint-custom');
+    customChip.classList.toggle('is-active', !named);
+    customChip.title = named ? 'Pick any colour' : `Custom ${custom.paint.toUpperCase()}`;
+  };
+
+  const finishMats = [...paintMats, ...edgeMats];
+  for (const m of finishMats) {
+    m.userData.gloss = {
+      metalness: m.metalness,
+      roughness: m.roughness,
+      clearcoat: m.clearcoat ?? 0,
+      clearcoatRoughness: m.clearcoatRoughness ?? 0,
+    };
+  }
+  applyFinish = () => {
+    for (const m of finishMats) {
+      const f = FINISHES[custom.finish] ?? m.userData.gloss;
+      m.metalness = f.metalness;
+      m.roughness = f.roughness;
+      if ('clearcoat' in m) {
+        m.clearcoat = f.clearcoat;
+        m.clearcoatRoughness = f.clearcoatRoughness;
+      }
+      m.needsUpdate = true;
+    }
+    for (const b of document.querySelectorAll('[data-finish]')) {
+      b.setAttribute('aria-pressed', String(b.dataset.finish === custom.finish));
+    }
   };
 
   const first = [...plateMats][0];
@@ -359,7 +399,7 @@ function setupCustomise(car) {
   const chips = document.getElementById('paint-chips');
   chips.innerHTML = PAINTS.map(
     ([name, hex]) =>
-      `<button type="button" class="chip" data-paint="${hex}" title="${name}" aria-label="${name}" aria-pressed="false" style="background:${hex}"></button>`
+      `<button type="button" class="chip${isLight(hex) ? ' light' : ''}" data-paint="${hex}" title="${name}" aria-label="${name}" aria-pressed="false" style="--c:${hex}"><span>${name}</span></button>`
   ).join('');
   const picker = document.getElementById('paint-picker');
   const plateInput = document.getElementById('plate-input');
@@ -369,6 +409,13 @@ function setupCustomise(car) {
     if (!chip) return;
     custom.paint = chip.dataset.paint;
     applyPaint();
+    writeHash();
+  });
+  document.querySelector('.finish').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-finish]');
+    if (!b) return;
+    custom.finish = b.dataset.finish;
+    applyFinish();
     writeHash();
   });
   picker.addEventListener('input', () => {
@@ -385,8 +432,10 @@ function setupCustomise(car) {
   document.getElementById('customise-reset').addEventListener('click', () => {
     custom.paint = DEFAULT_PAINT;
     custom.plate = '';
+    custom.finish = 'gloss';
     plateInput.value = '';
     applyPaint();
+    applyFinish();
     applyPlate();
     writeHash();
   });
@@ -394,6 +443,7 @@ function setupCustomise(car) {
   readHash();
   plateInput.value = custom.plate;
   applyPaint();
+  applyFinish();
   applyPlate();
   document.getElementById('customise').hidden = false;
 }

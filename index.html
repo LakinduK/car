@@ -108,12 +108,25 @@
           <button type="button" class="link" id="customise-reset" title="Back to cream and the original plate">Reset</button>
         </div>
 
-        <div class="panel" id="panel-doors" role="tabpanel" aria-labelledby="tab-doors">
-          <button type="button" data-door="Door_FL" aria-pressed="false">Front left</button>
-          <button type="button" data-door="Door_FR" aria-pressed="false">Front right</button>
-          <button type="button" data-door="Door_RL" aria-pressed="false">Rear left</button>
-          <button type="button" data-door="Door_RR" aria-pressed="false">Rear right</button>
-          <button type="button" data-door="all" class="strong">Open all</button>
+        <div class="panel doors-panel" id="panel-doors" role="tabpanel" aria-labelledby="tab-doors">
+          <div class="car-plan">
+            <svg class="plan-body" viewBox="0 0 200 84" aria-hidden="true">
+              <path class="plan-shell" d="M30 16H150c20 0 36 10 38 26-2 16-18 26-38 26H30c-10 0-17-7-17-16V32c0-9 7-16 17-16z"/>
+              <rect class="plan-roof" x="58" y="24" width="66" height="36" rx="9"/>
+              <path class="plan-glass" d="M127 23c10 4 15 11 15 19s-5 15-15 19z"/>
+              <path class="plan-glass" d="M45 26c-4 6-4 26 0 32l8-2V28z"/>
+              <path class="plan-lamp" d="M180 26l5 5M180 58l5-5"/>
+              <path class="plan-lamp tail" d="M15 27v5M15 52v5"/>
+            </svg>
+            <button type="button" class="door top front" data-door="Door_FL" aria-pressed="false" aria-label="Front left door" title="Front left"></button>
+            <button type="button" class="door top rear" data-door="Door_RL" aria-pressed="false" aria-label="Rear left door" title="Rear left"></button>
+            <button type="button" class="door bottom front" data-door="Door_FR" aria-pressed="false" aria-label="Front right door" title="Front right"></button>
+            <button type="button" class="door bottom rear" data-door="Door_RR" aria-pressed="false" aria-label="Rear right door" title="Rear right"></button>
+          </div>
+          <div class="door-meta">
+            <p class="door-status" id="door-status" aria-live="polite">All doors closed</p>
+            <button type="button" data-door="all" class="strong">Open all</button>
+          </div>
         </div>
 
         <div class="panel" id="panel-view" role="tabpanel" aria-labelledby="tab-view" hidden>
@@ -144,7 +157,11 @@
 
         <div id="customise" class="contents" hidden>
           <div class="panel paint-panel" id="panel-paint" role="tabpanel" aria-labelledby="tab-paint" hidden>
-            <p class="paint-readout" aria-live="polite"><strong id="paint-name">Cream</strong><span id="paint-hex">#EAE0C2</span></p>
+            <div class="finish" role="group" aria-label="Paint finish">
+              <button type="button" data-finish="gloss" aria-pressed="true">Gloss</button>
+              <button type="button" data-finish="metallic" aria-pressed="false">Metallic</button>
+              <button type="button" data-finish="matte" aria-pressed="false">Matte</button>
+            </div>
             <div class="chips">
               <div class="chips" id="paint-chips"></div>
               <label class="chip chip-custom" id="paint-custom" title="Pick any colour">
