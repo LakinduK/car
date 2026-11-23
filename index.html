@@ -163,7 +163,82 @@
       </div>
     </section>
 
-    <section class="gauges wrap" aria-label="Key figures" data-gauges></section>
+    <section class="stat-cards" aria-label="Key figures">
+      <div class="wrap stat-grid">
+        <article class="glass-card">
+          <header>
+            <span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></svg></span>
+            <div><h3>Performance</h3><p>Engine &amp; output</p></div>
+            <a class="go" href="#engine" aria-label="Engine details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></a>
+          </header>
+          <div class="glass-body perf">
+            <div>
+              <p class="big">90<span>PS</span></p>
+              <p class="note">at 6,000 rpm</p>
+              <svg class="curve" viewBox="0 0 240 80" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="curve-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#cfe3ee" stop-opacity=".28"/>
+                    <stop offset="1" stop-color="#cfe3ee" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path class="curve-area" d="M0 76 C40 72 70 60 100 46 S168 14 200 11 S232 15 240 19 V80 H0 Z"/>
+                <path class="curve-line" pathLength="1" d="M0 76 C40 72 70 60 100 46 S168 14 200 11 S232 15 240 19"/>
+                <circle class="curve-peak" cx="200" cy="11" r="3.5"/>
+              </svg>
+              <p class="caption">Power curve, illustrative</p>
+            </div>
+            <dl class="mini">
+              <div><dt>121<span>N·m</span></dt><dd>at 4,400 rpm</dd></div>
+              <div><dt>1,240<span>cc</span></dt><dd>CR12DE inline-4</dd></div>
+            </dl>
+          </div>
+        </article>
+
+        <article class="glass-card">
+          <header>
+            <span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 20h12M8 20V9.5a4 4 0 0 1 8 0V20M12 9.5v3"/><path d="M4 9.5h4M16 9.5h4"/></svg></span>
+            <div><h3>Power to weight</h3><p>Output per tonne</p></div>
+            <a class="go" href="#dimensions" aria-label="Weight and dimensions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></a>
+          </header>
+          <div class="glass-body ptw">
+            <div>
+              <p class="big">95<span>PS / t</span></p>
+              <p class="note">90 PS · 950 kg unladen</p>
+              <div class="segments" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <p class="caption">0 — 200 PS / t</p>
+            </div>
+            <svg class="ring" viewBox="0 0 80 80" aria-hidden="true">
+              <circle class="ring-track" cx="40" cy="40" r="30"/>
+              <circle class="ring-fill" cx="40" cy="40" r="30" pathLength="100" style="--p: 47.4"/>
+              <text x="40" y="44">47%</text>
+            </svg>
+          </div>
+        </article>
+
+        <article class="glass-card">
+          <header>
+            <span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 15.5 15.5 3 21 8.5 8.5 21z"/><path d="M7 11.5l1.5 1.5M9.5 9l2 2M12 6.5l1.5 1.5"/></svg></span>
+            <div><h3>Footprint</h3><p>Size on the road</p></div>
+            <a class="go" href="#dimensions" aria-label="All dimensions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></a>
+          </header>
+          <div class="glass-body foot">
+            <div>
+              <p class="big">3.72<span>m</span></p>
+              <p class="note">overall length</p>
+            </div>
+            <div class="bars" aria-hidden="true">
+              <div style="--h: 100"><i></i><span>Length</span><b>3.72</b></div>
+              <div style="--h: 65.3"><i></i><span>Wheelbase</span><b>2.43</b></div>
+              <div style="--h: 44.6"><i></i><span>Width</span><b>1.66</b></div>
+              <div style="--h: 40.9"><i></i><span>Height</span><b>1.52</b></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <div class="notice wrap" id="placeholder-notice" hidden>
       Figures marked <span class="tbc">to confirm</span> are typical K12 values, not yet checked against this car.
@@ -200,7 +275,6 @@
 
   <script type="module" src="specs.js"></script>
   <script type="module" src="ui.js"></script>
-  <script type="module" src="gauges.js"></script>
   <script type="module" src="main.js"></script>
 </body>
 </html>

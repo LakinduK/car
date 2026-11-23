@@ -465,49 +465,6 @@ h1 span { color: var(--accent); }
 }
 .hint.gone { opacity: 0; }
 
-/* ---------- instrument gauges ---------- */
-
-.gauges {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(16px, 3vw, 36px);
-  padding-top: clamp(48px, 7vw, 88px);
-}
-.gauge { margin: 0; text-align: center; }
-.gauge svg {
-  display: block;
-  width: 100%;
-  max-width: 240px;
-  margin-inline: auto;
-  border-radius: 50%;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-}
-.gauge figcaption { margin-top: 14px; }
-.gauge figcaption strong { display: block; font-family: var(--display); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
-.gauge figcaption span { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
-
-.g-track { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 1.5; }
-.g-red { fill: none; stroke: #e5322d; stroke-width: 7; opacity: 0.85; }
-.g-tick { stroke: rgba(255, 255, 255, 0.4); stroke-width: 1.3; stroke-linecap: round; }
-.g-tick.major { stroke: #f3f2ee; stroke-width: 2.6; }
-.g-tick.red { stroke: #ff5a4e; }
-.g-label { font-family: var(--display); font-size: 13px; font-weight: 600; fill: rgba(243, 242, 238, 0.85); text-anchor: middle; }
-.g-label.red { fill: #ff6b5f; }
-.g-legend { font-family: var(--sans); font-size: 7.5px; font-weight: 500; letter-spacing: 0.08em; fill: rgba(243, 242, 238, 0.45); text-anchor: middle; }
-.g-value {
-  font-family: var(--display);
-  font-size: 27px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  fill: #fff;
-  text-anchor: middle;
-  font-variant-numeric: tabular-nums;
-}
-.g-unit { font-family: var(--sans); font-size: 8px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; fill: rgba(243, 242, 238, 0.5); text-anchor: middle; }
-.needle { transform-origin: 100px 100px; }
-.needle path { fill: #ff5a1f; filter: drop-shadow(0 0 3px rgba(255, 90, 31, 0.7)); }
-.g-cap { fill: #1c1d21; stroke: #4a4c52; stroke-width: 2; }
-
 /* ---------- spec cards ---------- */
 
 .notice {
@@ -626,7 +583,6 @@ footer a { color: var(--ink); font-weight: 500; text-decoration: none; }
   .dock-head { flex-wrap: wrap; }
   .tabs [role="tab"] { padding: 8px 13px; }
 
-  .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
   .specs { grid-template-columns: 1fr; }
 }
 
@@ -875,3 +831,192 @@ h2 { font-weight: 400; letter-spacing: -0.02em; font-size: clamp(20px, 2vw, 24px
 
 /* past the hero, the theme's solid header wins over the dark glass */
 .masthead.is-scrolled.is-solid { background: var(--header-solid); }
+
+
+/* =====================================================================
+   Key-figure glass cards (replace the analog dials)
+   ===================================================================== */
+
+.stat-cards {
+  padding: 8px 0 clamp(40px, 6vw, 72px);
+  background: var(--steel-3);
+  color: var(--on-night);
+}
+.stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+
+.glass-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 20px 20px;
+  border-radius: 22px;
+  border: 1px solid var(--glass-line);
+  background: linear-gradient(180deg, rgba(64, 84, 96, 0.42), rgba(30, 42, 50, 0.42));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.glass-card header { display: flex; align-items: center; gap: 12px; }
+.glass-card header > div { flex: 1; min-width: 0; }
+.glass-card h3 { margin: 0; font-family: var(--display); font-size: 16px; font-weight: 500; letter-spacing: -0.01em; }
+.glass-card header p { margin: 1px 0 0; font-size: 12px; color: var(--on-night-muted); }
+.glass-card .tile {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  border-color: var(--glass-line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--on-night);
+}
+.glass-card .tile svg { width: 19px; height: 19px; }
+.go {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-line);
+  color: var(--on-night);
+  transition: background-color 150ms ease, transform 160ms var(--ease-out);
+}
+.go svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.go:active { transform: scale(0.94); }
+@media (hover: hover) and (pointer: fine) {
+  .go:hover { background: rgba(255, 255, 255, 0.1); }
+}
+
+.glass-body { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex: 1; }
+.glass-body > div:first-child { flex: 1; min-width: 0; }
+.big {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(34px, 3.4vw, 44px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.big span { margin-left: 6px; font-size: 0.42em; font-weight: 400; letter-spacing: 0; color: var(--on-night-muted); }
+.note { margin: 6px 0 0; font-size: 12px; color: var(--on-night-muted); }
+.caption { margin: 6px 0 0; font-size: 10.5px; letter-spacing: 0.04em; color: rgba(236, 242, 245, 0.4); }
+
+/* performance: power curve + side figures */
+.curve { display: block; width: 100%; height: 58px; margin-top: 12px; overflow: visible; }
+.curve-area { fill: url(#curve-fill); opacity: 0; transition: opacity 600ms ease 500ms; }
+.curve-line {
+  fill: none;
+  stroke: #eaf3f8;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+.curve-peak { fill: #fff; opacity: 0; transition: opacity 300ms ease 1000ms; }
+.in .curve-line { stroke-dashoffset: 0; }
+.in .curve-area, .in .curve-peak { opacity: 1; }
+
+.mini { display: grid; gap: 14px; margin: 0; padding-left: 16px; border-left: 1px solid var(--glass-line); }
+.mini dt { font-family: var(--display); font-size: 20px; font-weight: 400; letter-spacing: -0.02em; }
+.mini dt span { margin-left: 4px; font-size: 11px; color: var(--on-night-muted); }
+.mini dd { margin: 0; font-size: 11.5px; color: var(--on-night-muted); }
+
+/* power to weight: segment bar + ring */
+.segments { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: 18px; }
+.segments i {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color 300ms ease;
+}
+.in .segments i:nth-child(-n + 5) { background: #eaf3f8; }
+.in .segments i:nth-child(5) { background: repeating-linear-gradient(135deg, #eaf3f8 0 2px, rgba(255, 255, 255, 0.25) 2px 4px); }
+.segments i:nth-child(2) { transition-delay: 60ms; }
+.segments i:nth-child(3) { transition-delay: 120ms; }
+.segments i:nth-child(4) { transition-delay: 180ms; }
+.segments i:nth-child(5) { transition-delay: 240ms; }
+
+.ring { flex: none; width: 92px; height: 92px; }
+.ring circle { fill: none; stroke-width: 7; }
+.ring-track { stroke: rgba(255, 255, 255, 0.1); }
+.ring-fill {
+  stroke: #eaf3f8;
+  stroke-linecap: round;
+  stroke-dasharray: 0 100;
+  transform: rotate(-90deg);
+  transform-origin: 40px 40px;
+  transition: stroke-dasharray 1100ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.in .ring-fill { stroke-dasharray: var(--p) 100; }
+.ring text { fill: var(--on-night); font-family: var(--display); font-size: 14px; font-weight: 400; text-anchor: middle; }
+
+/* footprint: bar chart */
+.bars { display: flex; align-items: flex-end; gap: 12px; height: 104px; }
+.bars div { display: grid; grid-template-rows: 1fr auto auto; justify-items: center; height: 100%; width: 40px; }
+.bars i {
+  align-self: end;
+  width: 4px;
+  height: calc(var(--h) * 1%);
+  border-radius: 2px;
+  background: rgba(234, 243, 248, 0.45);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 800ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bars div:first-child i { background: #eaf3f8; width: 6px; }
+.bars div:nth-child(2) i { transition-delay: 70ms; }
+.bars div:nth-child(3) i { transition-delay: 140ms; }
+.bars div:nth-child(4) i { transition-delay: 210ms; }
+.in .bars i { transform: scaleY(1); }
+.bars span { margin-top: 6px; font-size: 9.5px; color: var(--on-night-muted); }
+.bars b { font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* =====================================================================
+   Bigger stage: the dock becomes one compact row on desktop
+   ===================================================================== */
+@media (min-width: 761px) {
+  .hero { min-height: 720px; }
+  .hero-copy { top: clamp(84px, 11vh, 120px); }
+  h1 { font-size: clamp(40px, 4.6vw, 68px); }
+
+  .dock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+    max-width: calc(100% - 2 * var(--pad));
+    bottom: 22px;
+    padding: 7px;
+    border-radius: 999px;
+  }
+  .dock-head { display: contents; }
+  .tabs { order: 1; }
+  .dock .panel { order: 2; min-height: 0; padding: 0 4px; flex-wrap: nowrap; }
+  .dock .paint-panel { flex-direction: row; align-items: center; gap: 14px; }
+  .paint-readout { flex-direction: column; gap: 0; min-width: 64px; }
+  .paint-readout strong { font-size: 14px; }
+  .paint-readout span { font-size: 10px; }
+  .dock .chips { flex-wrap: nowrap; gap: 7px; }
+  .dock .panel .chip { width: 28px; height: 28px; }
+  .dock .panel button:not(.chip) { padding: 8px 13px; }
+  .link { order: 3; padding-right: 14px; }
+  .hint { display: none; }
+
+  .orbit-ring { top: 63%; height: 22%; width: min(1240px, 96%); }
+  .turn-control { bottom: 92px; }
+}
+
+/* phones: three cards stack */
+@media (max-width: 760px) {
+  .stat-grid { grid-template-columns: 1fr; gap: 14px; }
+  .stat-cards { padding-top: 24px; }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-grid > :last-child { grid-column: 1 / -1; }
+}
+
+@media (min-width: 761px) {
+  .dock .panel button { white-space: nowrap; }
+}

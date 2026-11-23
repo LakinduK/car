@@ -52,7 +52,7 @@ let currentView = 'front';
 function frame() {
   const { clientWidth: w, clientHeight: h } = stage;
   if (currentView === 'cabin') camera.clearViewOffset();
-  else if (camera.aspect > 1.25) camera.setViewOffset(w, h, 0, h * 0.04, w, h); // centred, lifted clear of the dock
+  else if (camera.aspect > 1.25) camera.setViewOffset(w, h, 0, h * 0.035, w, h); // centred between the title and the dock
   else camera.setViewOffset(w, h, 0, -h * 0.03, w, h);
   camera.updateProjectionMatrix();
 }
@@ -90,9 +90,9 @@ function addGroundShadow(minY) {
 
 const VIEWS = {
   // direction from the car centre to the camera, and distance in car lengths
-  front: { dir: [0.55, 0.28, 1], dist: 2.6 },
-  side: { dir: [-1, 0.16, 0.02], dist: 2.6 },
-  rear: { dir: [-0.6, 0.3, -1], dist: 2.6 },
+  front: { dir: [0.55, 0.28, 1], dist: 1.95 },
+  side: { dir: [-1, 0.16, 0.02], dist: 1.95 },
+  rear: { dir: [-0.6, 0.3, -1], dist: 1.95 },
 };
 
 function viewPose(name) {
@@ -105,7 +105,7 @@ function viewPose(name) {
   const v = VIEWS[name];
   const target = carCenter.clone().add(new THREE.Vector3(0, -carSize.y * 0.08, 0));
   // Portrait screens: the stage is its own box below the title, so come in closer.
-  const fit = camera.aspect < 1 ? 0.6 / camera.aspect : Math.max(1, 1.1 / camera.aspect);
+  const fit = camera.aspect < 1 ? 0.85 / camera.aspect : Math.max(1, 1.1 / camera.aspect);
   const eye = target.clone().add(new THREE.Vector3(...v.dir).normalize().multiplyScalar(carSize.z * v.dist * fit));
   return { eye, target, min: carSize.z * 0.6, max: carSize.z * 4 };
 }

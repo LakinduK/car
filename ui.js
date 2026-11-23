@@ -51,6 +51,24 @@ if (matchMedia('(pointer: coarse)').matches) {
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Key-figure charts draw themselves (curve, ring, segments, bars) the first time they're seen.
+const statCards = document.querySelector('.stat-cards');
+if (statCards) {
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    statCards.classList.add('in');
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        statCards.classList.add('in');
+        io.disconnect();
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(statCards);
+  }
+}
+
 // Light / dark theme. The inline script in <head> already applied the saved or
 // system theme; this keeps the button in step and remembers a manual choice.
 const root = document.documentElement;
